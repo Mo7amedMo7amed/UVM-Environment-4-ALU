@@ -28,14 +28,15 @@ class Transaction extends uvm_sequence_item;
   //  Constrains 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
-  constraint unsigend_in {alu_in_a > 0; alu_in_b > 0;}
-  constraint rst {enable_alu_rst_n dist { 0 := 10 ,1:=90};}
+  constraint unsigend_in {alu_in_a >= 0; alu_in_b >= 0;}
+  constraint rst {enable_alu_rst_n dist { 1 := 90 ,0:=10};  
 
   constraint op_a_cons_and {  enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP1 -> alu_in_b != 8'h0;    }
-  constraint op_a_cons_nand { enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2 -> alu_in_b != 8'h03 && alu_in_a != 8'hFF;    }
-  
+  constraint op_a_cons_nand { if (enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2 )  !(alu_in_a inside {8'hFF});    }
+  constraint op_a_cons_nand2 { if (enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2)  !(alu_in_b inside {8'h03});    }
+
   constraint op_b_cons_and { enable_alu_rst_n && alu_enables == ENABLE_MODE_B && alu_op_b == OP2 -> alu_in_b != 8'h03;    }
-  constraint op_a_cons_nor { enable_alu_rst_n && alu_enables == ENABLE_MODE_B && alu_op_b == OP3 -> alu_in_a != 8'hF5;    }
+  constraint op_b_cons_nor { enable_alu_rst_n && alu_enables == ENABLE_MODE_B && alu_op_b == OP3 -> alu_in_a != 8'hF5;    }
 
   constraint irq_triggered { if (enable_alu_irq) (alu_enables inside {ENABLE_MODE_A,ENABLE_MODE_B}); }
   constraint irq_triggered_opA_and { (enable_alu_irq && enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP1 )  -> (alu_in_a & alu_in_b == 8'hFF);  }
@@ -52,12 +53,12 @@ class Transaction extends uvm_sequence_item;
   constraint direct_test_cases {enable_alu_rst_n && dir_case -> alu_in_a inside {8'h0, 8'hF0, 8'h02, 8'hFF }; alu_in_b inside {8'h0, 8'hF0, 8'h02, 8'hFF, 8'h0F};}
   
 
-  //  `uvm_object_utils(Transaction); // factory registration 
-  // using macros instead of uvm do functions to deal with the transaction 
-//  `uvm_object_utils_begin
-//
-//
-//  `uvm_object_utils_end
+    `uvm_object_utils(Transaction); // factory registration 
+   using macros instead of uvm do functions to deal with the transaction 
+  `uvm_object_utils_begin
+
+
+  `uvm_object_utils_end
 
   function new (string name = "Transaction");
     super.new(name);
@@ -69,36 +70,5 @@ class Transaction extends uvm_sequence_item;
 
 endclass
 
-}
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  Coverage model
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-  covergroup cg_operation_a ;
-	op_a: coverpoint { bins alu_op_a }
-	op_b: coverpoint { bins }
-
-  endgroup
-//////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-//  Test the transaction class 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-module tb;
-  logic clk =0;
-  Transaction trn_h;
- always begin #10 clk = ~clk; end
- initial begin  initialize ();  end 
- initial begin 
- #15;
-  trn_h = new ();
-
-  repeat (1000) begin 
-	 trn_h.randomize(); //$fatal ("Randomiztion fail!");
-          transfer(trn_h);
-          #1;
-	//$display (" a = 0x%x , b = 0x%x, rst = %d , alu_enables = %b, opcode_a = %d, opcodeB = %d", trn_h.alu_in_a, trn_h.alu_in_b, trn_h.enable_alu_rst_n, trn_h.alu_enables.name(), trn_h.alu_op_a, trn_h.alu_op_b   );
-
-  end
 
 
-end
- endmodule

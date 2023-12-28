@@ -5,7 +5,7 @@ interface ifc (input logic clk);
   data_t alu_in_a, alu_in_b;
   opcode_t alu_op_a, alu_op_b;
   logic alu_enable_a, alu_enable, alu_enable_b;
-  logic alu_rst;
+  logic alu_rst_n;
   logic alu_irq_clr;
   // outputs signals
   logic alu_irq;
@@ -15,7 +15,7 @@ interface ifc (input logic clk);
   // Tasks used be the drivers
   ///////////////////////////////////////////////////////////////////////////////////////// 
   task automatic  initialize ();
-   alu_rst = 0; 
+   alu_rst_n = 0; 
    alu_in_a = 0;
    alu_in_b = 0;
    alu_op_a = OP1 ;
@@ -24,18 +24,18 @@ interface ifc (input logic clk);
    alu_enable_b = 0;
    alu_enable = 0;
    #10;
-   alu_rst = 1;
+   alu_rst_n = 1;
   endtask
 
   task automatic transfer (project_pkg:: Transaction drv_trn);
    @(posedge clk);
-    alu_rst      <= drv_trn.enable_alu_rst_n;
+    alu_rst_n    <= drv_trn.enable_alu_rst_n;
     alu_in_a     <= drv_trn.alu_in_a;
     alu_in_b     <= drv_trn.alu_in_b;
     alu_op_a     <= drv_trn.alu_op_a;
     alu_op_b     <= drv_trn.alu_op_b;
     alu_irq_clr  <= drv_trn.enable_alu_irq_clr;
-    {alu_enable_b,alu_enable_a,alu_enable} <= bit'(drv_trn.alu_enables);
+    {alu_enable_b,alu_enable_a,alu_enable} <= drv_trn.alu_enables;
   endtask
 
 
@@ -92,7 +92,7 @@ interface ifc (input logic clk);
   
   // sec4.4.1 alu_irq_clr is high for at least one clk (prevent glich)
   irq_clr_stable_high1cycle: assert property ( @(posedge clk) disable iff (!alu_rst && alu_enable)
-	  $past($isunknown (alu_irq_clr))&& $isunknown(alu_irq_clr) |-> $error("There is a glitch in alu_irq_clr" ) );
+	  $past($isunknown (alu_irq_clr))&& $isunknown(alu_irq_clr) /*|-> $error("There is a glitch in alu_irq_clr" )*/ );
   
   // sec4.5 
    irq_successive_events_4a: assert property (@(posedge clk) disable iff (!alu_rst && alu_enable && alu_enable_a && !alu_enable_b)
@@ -102,11 +102,11 @@ interface ifc (input logic clk);
   
   // sec5.1 
   unkown_inputs: assert property ( @(posedge clk) disable iff (!alu_rst && alu_enable)
-	  !$isunknown(alu_in_a && alu_in_b && alu_op_a && alu_op_b && alu_irq && alu_out) |-> $error ("UNKNOWN VALUE!"));
+	  !$isunknown(alu_in_a && alu_in_b && alu_op_a && alu_op_b && alu_irq && alu_out) /*|-> $error ("UNKNOWN VALUE!")*/);
   
   //sec5.2 
   illegal_all_enables_high: assert property ( @(posedge clk) disable iff (!alu_rst)
-	  alu_enable && alu_enable_a && alu_enable_b |-> $error ("All enable signals are asserted high at the same time"));
+	  alu_enable && alu_enable_a && alu_enable_b /*|-> $error ("All enable signals are asserted high at the same time")*/);
   
   // sec6
   Idle_state:assert property ( @(posedge clk) disable iff (!alu_rst)
