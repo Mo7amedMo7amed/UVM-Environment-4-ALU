@@ -1,19 +1,23 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
-import alu_pkg::*;  // user defined data types 
+import alu_pkg::*;  // User defined data types 
 
 //`ifndef Transaction_exists
 //`define Transaction_exists
 class Transaction extends uvm_sequence_item;
-  // declare inputs
+  // Declare inputs
   rand  data_t alu_in_a, alu_in_b;
   rand  opcode_t alu_op_a, alu_op_b;
   rand  mode_t alu_enables;
-  bit   alu_rst_n = 1'b0;
+  bit   alu_rst_n ;
 	
-  // declare outputs 
+  // Declare outputs 
   logic [7:0] alu_out;
-  bit alu_irq;
+  logic alu_irq;
+
+  // Expected Results
+  logic [7:0] alu_out_expected;
+  logic   alu_irq_expected;
 
   // Knobs for driving configurations 
   rand bit   enable_alu_irq_clr; // 
@@ -22,14 +26,14 @@ class Transaction extends uvm_sequence_item;
 
   // Knobs for driving certain scenarios
   rand bit dir_case;
-
-//{
+ 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //  Constrains 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   constraint unsigend_in {alu_in_a >= 0; alu_in_b >= 0;}
-  constraint rst {enable_alu_rst_n dist { 1 := 90 ,0:=10};  
+  constraint rst {enable_alu_rst_n dist { 1 := 90 ,0:=10};}  
+  constraint enable_rst { enable_alu_rst_n -> alu_rst_n;}
 
   constraint op_a_cons_and {  enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP1 -> alu_in_b != 8'h0;    }
   constraint op_a_cons_nand { if (enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2 )  !(alu_in_a inside {8'hFF});    }
@@ -52,23 +56,63 @@ class Transaction extends uvm_sequence_item;
   constraint enabling_dir_case {dir_case dist {1 := 30, 0 :=70 }; }
   constraint direct_test_cases {enable_alu_rst_n && dir_case -> alu_in_a inside {8'h0, 8'hF0, 8'h02, 8'hFF }; alu_in_b inside {8'h0, 8'hF0, 8'h02, 8'hFF, 8'h0F};}
   
-
-    `uvm_object_utils(Transaction); // factory registration 
-   using macros instead of uvm do functions to deal with the transaction 
-  `uvm_object_utils_begin
-
-
-  `uvm_object_utils_end
+  // using macros instead of uvm do functions to deal with the transaction but to be noticed that this macros have shallow methods
+//  `uvm_object_utils_begin(Transaction)
+//   `uvm_field_enum (opcode_t,alu_op_a,UVM_ALL_ON)
+//   `uvm_field_enum (opcode_t,alu_op_b, UVM_ALL_ON)
+//   `uvm_field_enum (mode_t, alu_enables, UVM_ALL_ON)
+//  `uvm_object_utils_end
 
   function new (string name = "Transaction");
     super.new(name);
   endfunction 
-
-  // do functions
   
+  `uvm_object_utils(Transaction); // Factory registration if you ganna not used field macros, dont use both at same time this will lead to bad results 
+  //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  // Do functions :  used to do deep methods  
+  /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  virtual function  void do_copy (uvm_object rhs);
+    Transaction trn_h;
+    if (!$cast (trn_h,rhs)) `uvm_error (get_type_name(), "Illegal RHS argument! ")
   
+   super.do_copy(rhs);
+   alu_in_a         = trn_h.alu_in_a;
+   alu_in_b         = trn_h.alu_in_b;
+   alu_op_a         = trn_h.alu_op_a;
+   alu_op_b         = trn_h.alu_op_b;
+   alu_enables      = trn_h.alu_enables;
+   alu_rst_n        = trn_h.alu_rst_n;
+    //Outputs and expected 
+   alu_out          = trn_h.alu_out;
+   alu_irq          = trn_h.alu_irq;
+   alu_out_expected = trn_h.alu_out_expected;
+   alu_irq_expected = trn_h.alu_irq_expected;
+  endfunction 
 
+  virtual function bit do_compare (uvm_object rhs, uvm_comparer comparer) ;
+    Transaction trn_h;
+    if (!$cast (trn_h, rhs)) `uvm_error (get_type_name(), "Illegal RHS argument ..")
+   
+    return ( super.do_compare (rhs,comparer) && alu_out === trn_h.alu_out &&
+        	alu_irq === trn_h.alu_out && alu_out_expected === trn_h.alu_out_expected &&
+		alu_irq_expected == trn_h.alu_irq_expected );
+  endfunction
+
+  function void do_record (uvm_recorder recorder);
+    super.do_record (recorder);
+    
+   `uvm_record_field ("alu_enables", alu_enables.name)
+    `uvm_record_attribute (recorder.tr_handle,"alu_op_a" , alu_op_a)
+  endfunction
+
+  virtual function void do_print (uvm_printer printer);
+  printer.m_string = convert2string();
+  endfunction
+  
+  virtual function string convert2string ();
+    string s = super.convert2string();
+	$sformat (s,"%s\n alu_out = %0x" , s,alu_out);
+	$sformat (s,"%s\n alu_op_a = %s",s,alu_op_a.name);
+    return s;
+  endfunction
 endclass
-
-
-

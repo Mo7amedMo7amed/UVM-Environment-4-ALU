@@ -116,7 +116,7 @@ class CoverageCollector /*extends uvm_subscriber #(Transaction)*/ ;
 	alu_irq_reseted: coverpoint trn_h.alu_irq iff (!trn_h.enable_alu_rst_n) { bins alu_irq_zero = {1'h0}; bins others = default;}
  	alu_irq_clr :    coverpoint trn_h.alu_irq == {1'b0} iff (trn_h.enable_alu_irq_clr == {1'b1});
 	all_enables_high : coverpoint trn_h.alu_enables { illegal_bins all_high = {3'b111}; bins others = default;}
-
+	stuck_zero  :      coverpoint trn_h.alu_out {bins stuck_out = 0[*10]; bins others = default;}
   endgroup
   
 //  `uvm_component_utils(CoverageCollector)
