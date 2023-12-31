@@ -47,11 +47,22 @@ interface ifc (input logic clk);
   ///////////////////////////////////////////////////////////////////////////////////////////
   // Tasks used by the monitors 
   //////////////////////////////////////////////////////////////////////////////////////////
-
-
-
-
-
+  task collect_inout (project_pkg:: Transaction mon_trn);
+	@(posedge clk)
+	// Input signals from TX 
+ 	mon_trn.enable_alu_rst_n   = alu_rst_n;
+ 	mon_trn.alu_in_a           = alu_in_a;
+	mon_trn.alu_in_b           = alu_in_b;
+	mon_trn.alu_op_a           = alu_op_b ;
+	mon_trn.alu_op_b           = alu_op_b ;
+	mon_trn.enable_alu_irq_clr = alu_irq_clr;
+ 	mon_trn.alu_enables        = mode_t'{alu_enable_b,alu_enable_a,alu_enable};
+	
+	//Outputs signals from DUT
+	#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
+	mon_trn.alu_out 	   = alu.out;
+	mon_trn.alu_irq		   = alu.irq;
+  endtask : collect_inout
 
   //////////////////////////////////////////////////////////////////////////////////////////
   // councurrent asertions to implement the verification plan sections

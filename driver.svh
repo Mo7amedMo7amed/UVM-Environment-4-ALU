@@ -26,7 +26,7 @@ class Driver extends uvm_driver #(Transaction);
   function void build_phase (uvm_phase phase);
 	super.build_phase(phase);
 	if (!uvm_config_db#(virtual v_ifc)::get (this,"","vifc",v_ifc))
-	  `uvm_fatal ("DRV_NO_VIFC",{get_full_name(),".vifc"," \"Could not get interface\""})
+	  `uvm_fatal ("DRV_NO_VIFC",{get_full_name(),".vifc"," \"Could not get virtual interface\""})
   endfunction : build_phase
   
   // Run method 
