@@ -1,15 +1,21 @@
 import uvm_pkg::*;
+/*#####################################################################################################################################
+## Class name   : Transaction
+## Revision     : 
+## Release note :   
+/*#####################################################################################################################################*/
+
 `include "uvm_macros.svh"
 import alu_pkg::*;  // User defined data types 
 
-//`ifndef Transaction_exists
-//`define Transaction_exists
+`ifndef Transaction_exists
+`define Transaction_exists
 class Transaction extends uvm_sequence_item;
   // Declare inputs
   rand  data_t alu_in_a, alu_in_b;
   rand  opcode_t alu_op_a, alu_op_b;
   rand  mode_t alu_enables;
-  bit   alu_rst_n ;
+  //bit   alu_rst_n ;
 	
   // Declare outputs 
   logic [7:0] alu_out;
@@ -33,7 +39,7 @@ class Transaction extends uvm_sequence_item;
   
   constraint unsigend_in {alu_in_a >= 0; alu_in_b >= 0;}
   constraint rst {enable_alu_rst_n dist { 1 := 90 ,0:=10};}  
-  constraint enable_rst { enable_alu_rst_n -> alu_rst_n;}
+ // constraint enable_rst { enable_alu_rst_n -> alu_rst_n;}
 
   constraint op_a_cons_and {  enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP1 -> alu_in_b != 8'h0;    }
   constraint op_a_cons_nand { if (enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2 )  !(alu_in_a inside {8'hFF});    }
@@ -73,7 +79,7 @@ class Transaction extends uvm_sequence_item;
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   virtual function  void do_copy (uvm_object rhs);
     Transaction trn_h;
-    if (!$cast (trn_h,rhs)) `uvm_error (get_type_name(), "Illegal RHS argument! ")
+    if (!$cast (trn_h,rhs)) `uvm_error ("TX_CAST : ",{get_full_name(), " \" Illegal do_copy argument! \" "})
   
    super.do_copy(rhs);
    alu_in_a         = trn_h.alu_in_a;
@@ -81,7 +87,7 @@ class Transaction extends uvm_sequence_item;
    alu_op_a         = trn_h.alu_op_a;
    alu_op_b         = trn_h.alu_op_b;
    alu_enables      = trn_h.alu_enables;
-   alu_rst_n        = trn_h.alu_rst_n;
+  // alu_rst_n        = trn_h.alu_rst_n;
     //Outputs and expected 
    alu_out          = trn_h.alu_out;
    alu_irq          = trn_h.alu_irq;
@@ -91,7 +97,7 @@ class Transaction extends uvm_sequence_item;
 
   virtual function bit do_compare (uvm_object rhs, uvm_comparer comparer) ;
     Transaction trn_h;
-    if (!$cast (trn_h, rhs)) `uvm_error (get_type_name(), "Illegal RHS argument ..")
+    if (!$cast (trn_h, rhs)) `uvm_error ("TX_CAST",{get_type_name(), "Illegal do_compare argument .."})
    
     return ( super.do_compare (rhs,comparer) && alu_out === trn_h.alu_out &&
         	alu_irq === trn_h.alu_out && alu_out_expected === trn_h.alu_out_expected &&
@@ -116,3 +122,4 @@ class Transaction extends uvm_sequence_item;
     return s;
   endfunction
 endclass
+`endif
