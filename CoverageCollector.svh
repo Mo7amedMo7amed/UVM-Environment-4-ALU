@@ -7,7 +7,7 @@
 import uvm_pkg::*;
 `include "uvm_macros.svh"
 
-class CoverageCollector /*extends uvm_subscriber #(Transaction)*/ ;
+class Coverage_Collector /*extends uvm_subscriber #(Transaction)*/ ;
   Transaction trn_h;
   
 
