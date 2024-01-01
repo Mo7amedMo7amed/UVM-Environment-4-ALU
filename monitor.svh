@@ -26,7 +26,7 @@ class Monitor extends uvm_monitor ;
   // Build phase method
  virtual function void build_phase (uvm_phase phase );
     super.build_phase(phase); 
-    if (!uvm_config_db #(virtual v_ifc)::get (this, "", "v_ifc",v_ifc)) 
+    if (!uvm_config_db #(virtual ifc)::get (this, "", "v_ifc",v_ifc)) 
 	`uvm_fatal ("MON_NO_VIFC", {get_full_name(),".v_ifc","Could not get virtual interface"});
     mon_ap = new ("mon_ap",this);	
   endfunction : build_phase

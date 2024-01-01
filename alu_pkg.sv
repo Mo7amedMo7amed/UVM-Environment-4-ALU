@@ -15,7 +15,7 @@ typedef enum logic [1:0]{
   OP4 = 2'b11
 }opcode_t;
 
-// This type is used inside the transaction
+//This type is used inside the transaction
 typedef enum logic [2:0]{
   ENABLE_MODE_0   = 3'b000, 
   ENABLE_MODE_1   = 3'b001,
