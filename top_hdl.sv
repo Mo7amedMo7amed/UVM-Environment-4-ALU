@@ -1,7 +1,8 @@
-import alu_pkg::*;
+//
 
-module top_hdl ();
-logic clk =0;
+module top_hdl ;
+import alu_pkg::*;
+logic clk = 0;
 always #10 clk = ~clk;
 ifc v_ifc(clk); 
 alu alu0 (.alu_clk(clk), .alu_rst_n(v_ifc.alu_rst_n), .alu_in_a(v_ifc.alu_in_a),
