@@ -26,12 +26,14 @@ class Sequence extends uvm_sequence#(Transaction);
 
   task do_item ();
 	trn2drv = Transaction::type_id::create("trn2drv");  
-	`uvm_info ("SQN_BODY","Sending item to driver",UVM_LOW)
+	`uvm_info ("SQN_BODY","Sequence start item to driver",UVM_LOW)
 	start_item(trn2drv);
  	trn2drv.randomize();
-	`uvm_info("SQN_BODY","After starting sending item and just before finishing",UVM_LOW)
+	`uvm_info("SQN_BODY","Sequence Waiting finish item",UVM_LOW)
+	 trn2drv.print();
+	#1;
 	finish_item(trn2drv);
-	`uvm_info ("SQN_BODY","Done sending item to driver",UVM_LOW )
+	`uvm_info ("SQN_BODY","Sequence finish item to driver",UVM_LOW )
   endtask
 
 endclass

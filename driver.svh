@@ -25,7 +25,7 @@ class Driver extends uvm_driver #(Transaction);
   // Build method
   function void build_phase (uvm_phase phase);
 	super.build_phase(phase);
-	if (!uvm_config_db#(virtual ifc)::get (this,"","vifc",v_ifc))
+	if (!uvm_config_db#(virtual ifc)::get (this,"","v_ifc",v_ifc))
 	  `uvm_fatal ("DRV_NO_VIFC",{get_full_name(),".vifc"," \"Could not get virtual interface\""})
   endfunction : build_phase
   
@@ -33,11 +33,11 @@ class Driver extends uvm_driver #(Transaction);
   task run_phase (uvm_phase phase);
    v_ifc.initialize();
    forever begin
-	`uvm_info ("DRV_RUN","Driver request TX",UVM_LOW)
+	`uvm_info ("DRV_RUN","Driver get next item",UVM_LOW)
 	seq_item_port.get_next_item (trn_h);
-	`uvm_info ("DRV_RUN", "Driver got TX",UVM_LOW)
 	v_ifc.transfer(trn_h);
 	#3;
+	`uvm_info ("DRV_TRANSFER", trn_h.convert2string(),UVM_DEBUG)
 	seq_item_port.item_done(trn_h);
    end 
   endtask : run_phase

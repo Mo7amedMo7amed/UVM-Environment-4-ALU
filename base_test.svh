@@ -32,11 +32,11 @@ class Base_Test extends uvm_test;
 	//super.run_phase(phase);
 	
 	Sequence sqs_test = Sequence::type_id::create("sqs_test");
-	sqs_test.num_trn = 3;
+	sqs_test.num_trn = 1000;
  	
 	phase.raise_objection(this);
 	sqs_test.start(agt_h.sqr_h);
-	#30;
+	#10;
 	phase.drop_objection(this);
 
   endtask : run_phase

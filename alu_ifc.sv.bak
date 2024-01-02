@@ -60,8 +60,8 @@ interface ifc (input logic clk);
 	
 	//Outputs signals from DUT
 	#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
-	mon_trn.alu_out 	   = alu.out;
-	mon_trn.alu_irq		   = alu.irq;
+	mon_trn.alu_out 	   = alu_out;
+	mon_trn.alu_irq		   = alu_irq;
   endtask : collect_inout
 
   //////////////////////////////////////////////////////////////////////////////////////////

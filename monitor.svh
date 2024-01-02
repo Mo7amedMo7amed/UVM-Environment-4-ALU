@@ -4,8 +4,8 @@
 ## Release note   :   
 /*#####################################################################################################################################*/
 
-import uvm_pkg::*;
-`include "uvm_macros.svh"
+//import uvm_pkg::*;
+//`include "uvm_macros.svh"
 import project_pkg::*;
 
 `ifndef Monitor_exists
@@ -44,6 +44,7 @@ class Monitor extends uvm_monitor ;
   task collect_trn ();
 	collected_trn = Transaction::type_id::create("collected_trn");
 	v_ifc.collect_inout(collected_trn);
+	`uvm_info("MON_COLLECT",collected_trn.convert2string,UVM_DEBUG)
 	mon_ap.write (collected_trn);
   endtask : collect_trn
 endclass

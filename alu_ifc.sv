@@ -23,8 +23,8 @@ interface ifc (input logic clk);
    alu_rst_n = 0; 
    alu_in_a = 0;
    alu_in_b = 0;
-   alu_op_a = OP1 ;
-   alu_op_b = OP1;
+   alu_op_a = alu_op_a.first ;
+   alu_op_b = alu_op_b.first;
    alu_enable_a = 0;
    alu_enable_b = 0;
    alu_enable = 0;
@@ -53,19 +53,19 @@ interface ifc (input logic clk);
  	mon_trn.enable_alu_rst_n   = alu_rst_n;
  	mon_trn.alu_in_a           = alu_in_a;
 	mon_trn.alu_in_b           = alu_in_b;
-	mon_trn.alu_op_a           = alu_op_b ;
-	mon_trn.alu_op_b           = alu_op_b ;
 	mon_trn.enable_alu_irq_clr = alu_irq_clr;
  	mon_trn.alu_enables        = mode_t'{alu_enable_b,alu_enable_a,alu_enable};
+	$cast(mon_trn.alu_op_a , alu_op_a ) ;
+	$cast(mon_trn.alu_op_b,  alu_op_b ) ;
 	
 	//Outputs signals from DUT
-	#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
+	//#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
 	mon_trn.alu_out 	   = alu_out;
 	mon_trn.alu_irq		   = alu_irq;
   endtask : collect_inout
 
   //////////////////////////////////////////////////////////////////////////////////////////
-  // councurrent asertions to implement the verification plan sections
+  // councurrent asertions to implement some of the verification plan sections
   ///////////////////////////////////////////////////////////////////////////////////////////
   
   // sec.1 If the reset is active low alu_out and alu_irq should be zero  
