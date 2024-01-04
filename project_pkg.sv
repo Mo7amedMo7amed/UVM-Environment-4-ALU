@@ -18,6 +18,7 @@ package project_pkg ;
   typedef class Scoreboard;
  // typedef class Trn_Config;
   typedef class Agent;
+  typedef class Environment;
   typedef class Sequence;
   typedef class Base_Test;
 
@@ -31,6 +32,7 @@ package project_pkg ;
   `include "scoreboard.svh"
   //`include "trn_config.svh"
   `include "./agent.svh"
+  `include "environment.svh"
   `include "./sequence.svh"
   `include "./base_test.svh"
 

@@ -17,7 +17,7 @@ class Scoreboard extends uvm_component ;
 	// Data Members
 	Evaluator eval_h;
 	Predictor predict_h;
-	uvm_analysis_export #(Transaction) mon_ex1, mon_ex2;
+	uvm_analysis_export #(Transaction) agt_ex1, agt_ex2;
 
 	// Factory and Constractor
 	`uvm_component_utils (Scoreboard)
@@ -30,15 +30,15 @@ class Scoreboard extends uvm_component ;
 		super.build_phase(phase);
 		eval_h = Evaluator::type_id::create("eval_h",this);
 		predict_h= Predictor::type_id::create("predict_h",this);
-		mon_ex1 = new ("mon_ex1",this);
-		mon_ex2 = new ("mon_ex2",this);
+		agt_ex1 = new ("agt_ex1",this);
+		agt_ex2 = new ("agt_ex2",this);
 	endfunction : build_phase
 	
 	// Connect phase
 	function void connect_phase (uvm_phase phase);
 		predict_h.expected_ap.connect(eval_h.expected_ex);
-		mon_ex1.connect (predict_h.analysis_export);
-		mon_ex2.connect (eval_h.actual_ex);
+		agt_ex1.connect (predict_h.analysis_export);
+		agt_ex2.connect (eval_h.actual_ex);
 	endfunction : connect_phase
 endclass
 `endif
