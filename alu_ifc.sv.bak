@@ -23,8 +23,8 @@ interface ifc (input logic clk);
    alu_rst_n = 0; 
    alu_in_a = 0;
    alu_in_b = 0;
-   alu_op_a = OP1 ;
-   alu_op_b = OP1;
+   alu_op_a = alu_op_a.first ;
+   alu_op_b = alu_op_b.first;
    alu_enable_a = 0;
    alu_enable_b = 0;
    alu_enable = 0;
@@ -53,21 +53,23 @@ interface ifc (input logic clk);
  	mon_trn.enable_alu_rst_n   = alu_rst_n;
  	mon_trn.alu_in_a           = alu_in_a;
 	mon_trn.alu_in_b           = alu_in_b;
-	mon_trn.alu_op_a           = alu_op_b ;
-	mon_trn.alu_op_b           = alu_op_b ;
 	mon_trn.enable_alu_irq_clr = alu_irq_clr;
  	mon_trn.alu_enables        = mode_t'{alu_enable_b,alu_enable_a,alu_enable};
+	$cast(mon_trn.alu_op_a , alu_op_a ) ;
+	$cast(mon_trn.alu_op_b,  alu_op_b ) ;
 	
 	//Outputs signals from DUT
-	#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
+	//#3;    // Just a 3 nano to get stable outputs it does not releted to sync capturing with the dut signals 
 	mon_trn.alu_out 	   = alu_out;
 	mon_trn.alu_irq		   = alu_irq;
   endtask : collect_inout
+// initial begin   $monitor("alu_out = 0x%x", alu_out); end
+
 
   //////////////////////////////////////////////////////////////////////////////////////////
-  // councurrent asertions to implement the verification plan sections
+  // councurrent asertions to implement some of the verification plan sections
   ///////////////////////////////////////////////////////////////////////////////////////////
-  
+  /*
   // sec.1 If the reset is active low alu_out and alu_irq should be zero  
   rst_async: assert property ( @(posedge clk)
              ($rose(alu_rst_n))|=> (alu_out && alu_irq) == 0);
@@ -108,7 +110,7 @@ interface ifc (input logic clk);
   
   // sec4.4.1 alu_irq_clr is high for at least one clk (prevent glich)
   irq_clr_stable_high1cycle: assert property ( @(posedge clk) disable iff (!alu_rst_n && alu_enable)
-	  $past($isunknown (alu_irq_clr))&& $isunknown(alu_irq_clr) /*|-> $error("There is a glitch in alu_irq_clr" )*/ );
+	  $past($isunknown (alu_irq_clr))&& $isunknown(alu_irq_clr) /*|-> $error("There is a glitch in alu_irq_clr" )/ );
   
   // sec4.5 
    irq_successive_events_4a: assert property (@(posedge clk) disable iff (!alu_rst_n && alu_enable && alu_enable_a && !alu_enable_b)
@@ -118,11 +120,11 @@ interface ifc (input logic clk);
   
   // sec5.1 
   unkown_inputs: assert property ( @(posedge clk) disable iff (!alu_rst_n && alu_enable)
-	  !$isunknown(alu_in_a && alu_in_b && alu_op_a && alu_op_b && alu_irq && alu_out) /*|-> $error ("UNKNOWN VALUE!")*/);
+	  !$isunknown(alu_in_a && alu_in_b && alu_op_a && alu_op_b && alu_irq && alu_out) /*|-> $error ("UNKNOWN VALUE!")/);
   
   //sec5.2 
   illegal_all_enables_high: assert property ( @(posedge clk) disable iff (!alu_rst_n)
-	  alu_enable && alu_enable_a && alu_enable_b /*|-> $error ("All enable signals are asserted high at the same time")*/);
+	  alu_enable && alu_enable_a && alu_enable_b /*|-> $error ("All enable signals are asserted high at the same time")/);
   
   // sec6
   Idle_state:assert property ( @(posedge clk) disable iff (!alu_rst_n)
@@ -134,5 +136,5 @@ interface ifc (input logic clk);
 	!$stable(alu_in_b)     or  !$stable(alu_in_a)     or
 	!$stable(alu_op_a)     or  !$stable(alu_op_b)       |=> $stable(alu_out) [*1:10]); 
 
-
+	*/
 endinterface

@@ -15,6 +15,7 @@ class Agent extends uvm_agent ;
   Driver drv_h;
   Sequencer sqr_h;
   Monitor mon_h;
+  Coverage_Collector cov_h;
   //Trn_Config  trn_config;
   uvm_analysis_port #(Transaction) agt_ap; // analysis port to communicate agent with coverage collector and scoreboard ... defer then monitor ap  
 
@@ -33,6 +34,7 @@ class Agent extends uvm_agent ;
 	  sqr_h = Sequencer::type_id:: create("Sequencer",this); 
 	end
 	mon_h = Monitor::type_id::create("Monitor",this);
+	cov_h = Coverage_Collector::type_id::create ("Coverage_Collector",this);
 	agt_ap = new ("agt_ap",this);
   endfunction : build_phase
 
@@ -42,6 +44,7 @@ class Agent extends uvm_agent ;
  	if (get_is_active() == UVM_ACTIVE)begin 
 	  drv_h.seq_item_port.connect (sqr_h.seq_item_export);
 	  mon_h.mon_ap.connect(this.agt_ap);
+	  mon_h.mon_ap.connect(cov_h.analysis_export);
 	end
   endfunction : connect_phase
 

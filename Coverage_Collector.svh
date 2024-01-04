@@ -4,13 +4,15 @@
 ## Release note :   
 /*#####################################################################################################################################*/
 
+/*  import project_pkg::*;
+import alu_pkg::*;
 import uvm_pkg::*;
-`include "uvm_macros.svh"
-
-class Coverage_Collector /*extends uvm_subscriber #(Transaction)*/ ;
+`include "uvm_macros.svh"  */
+ 
+class Coverage_Collector extends uvm_subscriber #(Transaction) ;
   Transaction trn_h;
-  
-
+  uvm_analysis_export #(Transaction) conv_export;
+  uvm_tlm_analysis_fifo #(Transaction) conv_fifo;
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  Coverage model
@@ -61,17 +63,17 @@ class Coverage_Collector /*extends uvm_subscriber #(Transaction)*/ ;
 				ignore_bins ig1 = !binsof(irq_and) || !binsof(irq_state.irq_high);}
         irq_active_nand:    cross irq_nand , irq_state {  
 				bins irq_hi_nand = binsof(irq_nand) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof(irq_nand) || !binsof (irq_state.irq_high);}
+				ignore_bins ig2 = !binsof(irq_nand) || !binsof (irq_state.irq_high);}
         irq_active_or:    cross irq_or , irq_state {  
 				bins irq_hi_or = binsof (irq_or) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof (irq_or) || !binsof (irq_state.irq_high);}
+				ignore_bins ig3 = !binsof (irq_or) || !binsof (irq_state.irq_high);}
         irq_active_xor:    cross irq_xor , irq_state {  
 				bins irq_hi_xor = binsof (irq_xor) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof (irq_xor) || !binsof (irq_state.irq_high);}
+				ignore_bins ig4 = !binsof (irq_xor) || !binsof (irq_state.irq_high);}
 
   endgroup
 
-  covergroup cg_operation_b @( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B ) ;
+   covergroup cg_operation_b @( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B ) ;
 	op_b: coverpoint trn_h.alu_op_b { 
 	      bins op_a_and   = {OP1};
 	      bins op_a_nand  = {OP2};
@@ -107,13 +109,13 @@ class Coverage_Collector /*extends uvm_subscriber #(Transaction)*/ ;
 				ignore_bins ig1 = !binsof(irq_xnor) || !binsof(irq_state.irq_high);}
         irq_active_and:    cross irq_and , irq_state {  
 				bins irq_hi_and = binsof(irq_and) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof(irq_and) || !binsof (irq_state.irq_high);}
+				ignore_bins ig2 = !binsof(irq_and) || !binsof (irq_state.irq_high);}
         irq_active_nor:    cross irq_nor , irq_state {  
 				bins irq_hi_nor = binsof (irq_nor) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof (irq_nor) || !binsof (irq_state.irq_high);}
+				ignore_bins ig3 = !binsof (irq_nor) || !binsof (irq_state.irq_high);}
         irq_active_or:    cross irq_or , irq_state {  
 				bins irq_hi_or = binsof (irq_or) && binsof (irq_state.irq_high);
-				ignore_bins ig1 = !binsof (irq_or) || !binsof (irq_state.irq_high);}
+				ignore_bins ig4 = !binsof (irq_or) || !binsof (irq_state.irq_high);}
 
   endgroup
 
@@ -122,19 +124,42 @@ class Coverage_Collector /*extends uvm_subscriber #(Transaction)*/ ;
 	alu_irq_reseted: coverpoint trn_h.alu_irq iff (!trn_h.enable_alu_rst_n) { bins alu_irq_zero = {1'h0}; bins others = default;}
  	alu_irq_clr :    coverpoint trn_h.alu_irq == {1'b0} iff (trn_h.enable_alu_irq_clr == {1'b1});
 	all_enables_high : coverpoint trn_h.alu_enables { illegal_bins all_high = {3'b111}; bins others = default;}
-	stuck_zero  :      coverpoint trn_h.alu_out {bins stuck_out = 0[*10]; bins others = default;}
+	//stuck_zero  :      coverpoint trn_h.alu_out {bins stuck_out = 0[*10]; bins others = default;}
   endgroup
   
-//  `uvm_component_utils(CoverageCollector)
-//  function new (string name , uvm_component parent);
-//    super.new (name, parent);
-//    // Constract the coverage groups 
-//
-//
-//  endfunction : new
+ `uvm_component_utils(Coverage_Collector)
+ function new (string name , uvm_component parent);
+   super.new (name, parent);
+   // Constract the coverage groups 
+	//cg_operation_a  = new();
+	//cg_operation_b  = new();
+	cg_others       = new();
+ endfunction : new
 
-//  virtual function void write  (Transaction mon_t);
-//    this.trn_h = mon_t;
-//    cg.sample();
-//  endfunction : write
+  function void build_phase(uvm_phase phase);
+	super.build_phase(phase);
+	conv_export = new ("conv_export",this);
+	conv_fifo = new ("conv_fifo",this);
+  endfunction
+  
+  function void connect_phase (uvm_phase phase);
+	super.connect_phase(phase);
+	conv_export.connect (conv_fifo.analysis_export);
+  endfunction
+  
+   function void write(Transaction t);
+    $cast(trn_h, t.clone());
+	//cg_others.sample();
+	//trn_h.print();
+	//cg_operation_a.sample();
+        //cg_operation_b.sample(); 
+  endfunction: write
+  
+  virtual task run_phase (uvm_phase phase);
+	forever begin
+		conv_fifo.get(trn_h);
+		trn_h.print();
+		cg_others.sample();
+	end
+  endtask
 endclass

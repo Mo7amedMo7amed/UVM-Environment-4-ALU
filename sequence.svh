@@ -29,11 +29,10 @@ class Sequence extends uvm_sequence#(Transaction);
 	`uvm_info ("SQN_BODY","Sequence start item to driver",UVM_LOW)
 	start_item(trn2drv);
  	trn2drv.randomize();
-	`uvm_info("SQN_BODY","Sequence Waiting finish item",UVM_LOW)
-	 trn2drv.print();
-	#1;
+	`uvm_info("SQN_BODY",trn2drv.convert2string(),UVM_DEBUG)
+	 //trn2drv.print();
+	//#1;  // NOT allowed to add delay between start_item and finish_item
 	finish_item(trn2drv);
-	`uvm_info ("SQN_BODY","Sequence finish item to driver",UVM_LOW )
   endtask
 
 endclass

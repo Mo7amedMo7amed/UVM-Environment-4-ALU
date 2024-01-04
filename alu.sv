@@ -50,7 +50,7 @@ module alu
 				end
 				else begin
 				alu_out <= '0; alu_irq_r <= '0;
-				$warning("@%t:%m Unrecognized mode {alu_enable,alu_enable_a,alu_enable_b}=%0b ", $realtime, {alu_enable,alu_enable_a,alu_enable_b});
+				//$warning("@%t:%m Unrecognized mode {alu_enable,alu_enable_a,alu_enable_b}=%0b ", $realtime, {alu_enable,alu_enable_a,alu_enable_b});
 				end
 		end
 	end
@@ -85,6 +85,8 @@ module alu
 	end 
 	
 	assign alu_irq = alu_irq_clr ? 1'b0: alu_irq_r;
+        /*initial begin $monitor("alu_out = %d, alu_in_a = %d, alu_op_a=%s, alu_enable_a,alu_enable_b,alu_enable=%b",
+					alu_out, alu_in_a, alu_op_a.name, {alu_enable_a,alu_enable_b,alu_enable}); end*/
 endmodule
 
 
@@ -103,7 +105,10 @@ endmodule
 
 
 
-	alu alu0 (.alu_clk(alu_clk), .alu_rst_n(alu_rst_n), .alu_in_a(alu_in_a),.alu_in_b(alu_in_b),.alu_op_a(alu_op_a),.alu_op_b(alu_op_b),.alu_out(alu_out), .alu_irq(alu_irq), .alu_enable(alu_enable),.alu_enable_a(alu_enable_a), .alu_enable_b(alu_enable_b),.alu_irq_clr(alu_irq_clr));
+	alu alu0 (.alu_clk(alu_clk), .alu_rst_n(alu_rst_n), .alu_in_a(alu_in_a),
+	.alu_in_b(alu_in_b),.alu_op_a(alu_op_a),.alu_op_b(alu_op_b),.alu_out(alu_out)
+	, .alu_irq(alu_irq), .alu_enable(alu_enable),.alu_enable_a(alu_enable_a),
+	.alu_enable_b(alu_enable_b),.alu_irq_clr(alu_irq_clr));
 
 	always #10 alu_clk = ~alu_clk;
     always begin #7 alu_in_a = $random; alu_in_b = $random;

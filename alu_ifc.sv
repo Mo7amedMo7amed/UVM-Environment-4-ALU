@@ -63,6 +63,8 @@ interface ifc (input logic clk);
 	mon_trn.alu_out 	   = alu_out;
 	mon_trn.alu_irq		   = alu_irq;
   endtask : collect_inout
+// initial begin   $monitor("alu_out = 0x%x", alu_out); end
+
 
   //////////////////////////////////////////////////////////////////////////////////////////
   // councurrent asertions to implement some of the verification plan sections
@@ -134,5 +136,5 @@ interface ifc (input logic clk);
 	!$stable(alu_in_b)     or  !$stable(alu_in_a)     or
 	!$stable(alu_op_a)     or  !$stable(alu_op_b)       |=> $stable(alu_out) [*1:10]); 
 
-
+	
 endinterface

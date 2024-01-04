@@ -12,6 +12,10 @@ package project_pkg ;
   typedef class Driver;
   typedef class Sequencer;
   typedef class Monitor;
+  typedef class Coverage_Collector;
+  typedef class Evaluator;
+  typedef class Predictor;
+  typedef class Scoreboard;
  // typedef class Trn_Config;
   typedef class Agent;
   typedef class Sequence;
@@ -21,6 +25,10 @@ package project_pkg ;
   `include "./driver.svh"
   `include "./sequencer.svh"
   `include "./monitor.svh"
+  `include "Coverage_Collector.svh"
+  `include "evaluator.svh"
+  `include "predictor.svh"
+  `include "scoreboard.svh"
   //`include "trn_config.svh"
   `include "./agent.svh"
   `include "./sequence.svh"

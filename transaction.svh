@@ -32,14 +32,14 @@ class Transaction extends uvm_sequence_item;
 
   // Knobs for driving certain scenarios
   rand bit dir_case;
- 
+     //  bit good_or = 1'b1;
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   //  Constrains 
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
   
   constraint unsigend_in {alu_in_a >= 0; alu_in_b >= 0;}
   constraint rst {enable_alu_rst_n dist { 1 := 90 ,0:=10};}  
- // constraint enable_rst { enable_alu_rst_n -> alu_rst_n;}
+  constraint enable_dist { alu_enables dist {ENABLE_MODE_A := 45, ENABLE_MODE_B := 45};}
 
   constraint op_a_cons_and {  enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP1 -> alu_in_b != 8'h0;    }
   constraint op_a_cons_nand { if (enable_alu_rst_n && alu_enables == ENABLE_MODE_A && alu_op_a == OP2 )  !(alu_in_a inside {8'hFF});    }
@@ -68,7 +68,7 @@ class Transaction extends uvm_sequence_item;
    `uvm_field_enum (opcode_t,alu_op_b, UVM_ALL_ON)
    `uvm_field_enum (mode_t, alu_enables, UVM_ALL_ON)
   `uvm_object_utils_end
-	static num_trn = 0;
+	static int num_trn = 0;
   function new (string name = "Transaction");
     super.new(name);
 	num_trn = num_trn++;

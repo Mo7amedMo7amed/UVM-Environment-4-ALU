@@ -36,7 +36,7 @@ class Driver extends uvm_driver #(Transaction);
 	`uvm_info ("DRV_RUN","Driver get next item",UVM_LOW)
 	seq_item_port.get_next_item (trn_h);
 	v_ifc.transfer(trn_h);
-	#3;
+	#50;
 	`uvm_info ("DRV_TRANSFER", trn_h.convert2string(),UVM_DEBUG)
 	seq_item_port.item_done(trn_h);
    end 
