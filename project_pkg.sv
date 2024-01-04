@@ -16,7 +16,7 @@ package project_pkg ;
   typedef class Evaluator;
   typedef class Predictor;
   typedef class Scoreboard;
- // typedef class Trn_Config;
+ // typedef class Config;	// No need for it as the agent get config directly
   typedef class Agent;
   typedef class Environment;
   typedef class Sequence;
@@ -30,7 +30,7 @@ package project_pkg ;
   `include "evaluator.svh"
   `include "predictor.svh"
   `include "scoreboard.svh"
-  //`include "trn_config.svh"
+  //`include "config.svh"
   `include "./agent.svh"
   `include "environment.svh"
   `include "./sequence.svh"
