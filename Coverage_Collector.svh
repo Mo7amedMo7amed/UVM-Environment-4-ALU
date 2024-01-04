@@ -12,13 +12,13 @@ import uvm_pkg::*;
 class Coverage_Collector extends uvm_subscriber #(Transaction) ;
   Transaction trn_h;
   uvm_analysis_export #(Transaction) conv_export;
-  uvm_tlm_analysis_fifo #(Transaction) conv_fifo;
+  uvm_tlm_analysis_fifo #(Transaction) conv_fifo; 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 //  Coverage model
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
  
-  covergroup cg_operation_a @( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_A ) ;
+  covergroup cg_operation_a ;//@( trn_h.enable_alu_rst_n &&  trn_h.alu_enables == ENABLE_MODE_A ) ;
 	op_a: coverpoint trn_h.alu_op_a { 
 	      bins op_a_and   = {OP1};
 	      bins op_a_nand  = {OP2};
@@ -73,7 +73,7 @@ class Coverage_Collector extends uvm_subscriber #(Transaction) ;
 
   endgroup
 
-   covergroup cg_operation_b @( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B ) ;
+   covergroup cg_operation_b; //@( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B ) ;
 	op_b: coverpoint trn_h.alu_op_b { 
 	      bins op_a_and   = {OP1};
 	      bins op_a_nand  = {OP2};
@@ -131,8 +131,8 @@ class Coverage_Collector extends uvm_subscriber #(Transaction) ;
  function new (string name , uvm_component parent);
    super.new (name, parent);
    // Constract the coverage groups 
-	//cg_operation_a  = new();
-	//cg_operation_b  = new();
+	cg_operation_a  = new();
+	cg_operation_b  = new();
 	cg_others       = new();
  endfunction : new
 
@@ -145,21 +145,30 @@ class Coverage_Collector extends uvm_subscriber #(Transaction) ;
   function void connect_phase (uvm_phase phase);
 	super.connect_phase(phase);
 	conv_export.connect (conv_fifo.analysis_export);
-  endfunction
+  endfunction 
   
    function void write(Transaction t);
-    $cast(trn_h, t.clone());
-	//cg_others.sample();
-	//trn_h.print();
-	//cg_operation_a.sample();
-        //cg_operation_b.sample(); 
+		$cast(trn_h, t.clone());
+	
+		//trn_h.print();
+/* 		cg_others.sample();
+		
+		if ( trn_h.enable_alu_rst_n &&  trn_h.alu_enables == ENABLE_MODE_A )begin
+		cg_operation_a.sample();end
+		if ( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B )begin
+        cg_operation_b.sample(); end  */
   endfunction: write
   
-  virtual task run_phase (uvm_phase phase);
+   virtual task run_phase (uvm_phase phase);
 	forever begin
 		conv_fifo.get(trn_h);
-		trn_h.print();
+		//trn_h.print();
 		cg_others.sample();
+		
+		if ( trn_h.enable_alu_rst_n &&  trn_h.alu_enables == ENABLE_MODE_A )begin
+		cg_operation_a.sample();end
+		if ( trn_h.enable_alu_rst_n && trn_h.alu_enables == ENABLE_MODE_B )begin
+        cg_operation_b.sample(); end
 	end
   endtask
 endclass

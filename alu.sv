@@ -39,7 +39,7 @@ module alu
 					endcase
 				end
 				
-				else if (alu_enable == 1 && alu_enable_a != 1 && alu_enable_b ==1)begin 
+				 if (alu_enable == 1 && alu_enable_a != 1 && alu_enable_b ==1)begin 
 					case (alu_op_b)
 					OP1:	alu_out <= alu_in_a ^~ alu_in_b;
 					OP2:	if (alu_in_b != 8'h03) alu_out <= (alu_in_a & alu_in_b);
@@ -70,7 +70,7 @@ module alu
 				default: alu_irq_r <= '0;
 				endcase
 			end
-			else if (alu_enable == 1 && alu_enable_a != 1 && alu_enable_b == 1)begin
+			 if (alu_enable == 1 && alu_enable_a != 1 && alu_enable_b == 1)begin
 				case (alu_op_b)
 				OP1: alu_irq_r <= (alu_in_a ^~ alu_in_b == 8'hF1) ? 1'b1 : 1'b0;
 				OP2: alu_irq_r <= (alu_in_a & alu_in_b == 8'hF4)  ? 1'b1 : 1'b0;

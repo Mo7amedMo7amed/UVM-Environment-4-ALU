@@ -16,7 +16,8 @@ class Evaluator extends uvm_component ;
 	// Data Members
 	Transaction expected_trn;
 	Transaction actual_trn;
-	
+	  int match, mismatch;	
+
 	// Factory reg and Constractor
 	`uvm_component_utils(Evaluator)
 	function new (string name = "Evaluator", uvm_component parent = null);
@@ -41,23 +42,33 @@ class Evaluator extends uvm_component ;
 	// Connect Phase
 	function void connect_phase (uvm_phase phase);
 		super.connect_phase(phase);
-		expected_ex.connect (expected_fifo.export_port);
-		actual_ex.connect (actual_fifo.export_port);
+		expected_ex.connect (expected_fifo.analysis_export);
+		actual_ex.connect (actual_fifo.analysis_export);
 	endfunction
 	
 	// Run Phase
 	virtual task run_phase(uvm_phase phase);
+		//#60;
 		forever begin
-		expected_ex.get(expected_trn);
+		expected_fifo.get(expected_trn);
 		actual_fifo.get(actual_trn);
 		if (actual_trn.alu_out!== expected_trn.alu_out) begin
-			`uvm_info ("EVAL_!EQUAL",{"The expected alu_out : %m",expected_trn.convert2string,"The actual alu_out :",actual_trn.convert2string},UVM_LOW)
+			`uvm_info ("EVAL_!EQUAL",{"The expected alu_out : %d",expected_trn.alu_out,"The actual alu_out : %d",actual_trn.alu_out},UVM_LOW)
+		mismatch ++;
 		end
 		if (actual_trn.alu_irq!== expected_trn.alu_irq) begin
-			`uvm_info ("EVAL_!EQUAL",{"The expected alu_irq : %m",expected_trn.convert2string,"The actual alu_irq:",actual_trn.convert2string},UVM_LOW)
+			`uvm_info ("EVAL_!EQUAL",{"The expected alu_irq : %d",expected_trn.alu_irq,"The actual alu_irq : %d",actual_trn.alu_irq},UVM_LOW)
+		mismatch ++;	
 		end
+		else begin match++; end
 		end
 	endtask
+	
+	// Report phase
+	virtual function void report_phase( uvm_phase phase );
+    `uvm_info("SCB", $sformatf("Matches: %0d", match), UVM_NONE)
+    `uvm_info("SCB", $sformatf("Mismatches: %0d", mismatch), UVM_NONE)
+  endfunction: report_phase
 	
 endclass
 `endif

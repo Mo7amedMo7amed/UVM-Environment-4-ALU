@@ -24,7 +24,6 @@ class Base_Test extends uvm_test;
   virtual function void build_phase (uvm_phase phase);
   	super.build_phase (phase);
 	 env_h = Environment::type_id::create("env_h",this);
-	configure_agt();
   endfunction : build_phase
 
   // Run
@@ -41,9 +40,5 @@ class Base_Test extends uvm_test;
 
   endtask : run_phase
 
-  // Configure the agent to be active or passive
-  virtual function void configure_agt ();
-	env_h.agt_h.is_active = UVM_ACTIVE;
-  endfunction : configure_agt
 endclass
 `endif

@@ -26,6 +26,7 @@ class Environment extends uvm_env;
 		super.build_phase(phase);
 		agt_h = Agent::type_id::create("agt_h",this);
 		scr_h = Scoreboard::type_id::create("scr_h",this);
+		configure_agt();
 	endfunction : build_phase
 	
 	//Connect Phase
@@ -34,5 +35,10 @@ class Environment extends uvm_env;
 		agt_h.agt_ap.connect(scr_h.agt_ex2);
 	
 	endfunction : connect_phase
+
+  // Configure the agent to be active or passive
+  virtual function void configure_agt ();
+	agt_h.is_active = UVM_ACTIVE;
+  endfunction : configure_agt
 endclass
 `endif

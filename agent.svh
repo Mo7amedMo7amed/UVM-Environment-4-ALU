@@ -16,7 +16,7 @@ class Agent extends uvm_agent ;
   Sequencer sqr_h;
   Monitor mon_h;
   Coverage_Collector cov_h;
-  //Trn_Config  trn_config;
+  //Config  conf_h;
   uvm_analysis_port #(Transaction) agt_ap; // analysis port to communicate agent with coverage collector and scoreboard ... defer then monitor ap  
 
   // Factroy reg and constractor
@@ -28,7 +28,7 @@ class Agent extends uvm_agent ;
   // Build phase 
   virtual function void build_phase (uvm_phase phase);
 	super.build_phase (phase);
-	//if (uvm_config_db#(Trn_Config)::get (this,"","trn_config",trn_config)) `uvm_error ("AGT_BUILD",{get_full_name,"Config to agent"}); 
+	//if (uvm_config_db#(Config)::get (this,"","conf_h",conf_h)) `uvm_error ("AGT_BUILD",{get_full_name,"Config to agent"}); 
 	if (get_is_active() == UVM_ACTIVE)begin
 	  drv_h = Driver::type_id :: create ("Driver",this);
 	  sqr_h = Sequencer::type_id:: create("Sequencer",this); 
@@ -44,7 +44,7 @@ class Agent extends uvm_agent ;
  	if (get_is_active() == UVM_ACTIVE)begin 
 	  drv_h.seq_item_port.connect (sqr_h.seq_item_export);
 	  mon_h.mon_ap.connect(this.agt_ap);
-	  mon_h.mon_ap.connect(cov_h.analysis_export);
+	  mon_h.mon_ap.connect(cov_h.conv_export);
 	end
   endfunction : connect_phase
 
