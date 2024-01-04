@@ -12,7 +12,7 @@ import project_pkg::*;
 `define Base_Test_exists
 class Base_Test extends uvm_test;
   // Data Members
-  Agent agt_h;
+  Environment env_h;
 
   // Constractor and factory reg
   `uvm_component_utils (Base_Test)
@@ -23,7 +23,7 @@ class Base_Test extends uvm_test;
   // Build phase
   virtual function void build_phase (uvm_phase phase);
   	super.build_phase (phase);
-	 agt_h = Agent::type_id::create("agt_h",this);
+	 env_h = Environment::type_id::create("env_h",this);
 	configure_agt();
   endfunction : build_phase
 
@@ -35,7 +35,7 @@ class Base_Test extends uvm_test;
 	sqs_test.num_trn = 1000;
  	
 	phase.raise_objection(this);
-	sqs_test.start(agt_h.sqr_h);
+	sqs_test.start(env_h.agt_h.sqr_h);
 	#10;
 	phase.drop_objection(this);
 
@@ -43,7 +43,7 @@ class Base_Test extends uvm_test;
 
   // Configure the agent to be active or passive
   virtual function void configure_agt ();
-	agt_h.is_active = UVM_ACTIVE;
+	env_h.agt_h.is_active = UVM_ACTIVE;
   endfunction : configure_agt
 endclass
 `endif
